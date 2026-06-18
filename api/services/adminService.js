@@ -8,15 +8,28 @@ async function listCheckins(eventId) {
   return checkinRepository.findByEventId(eventId);
 }
 
-async function exportCsv(eventId) {
-  const rows = await reservationRepository.findForExport(eventId);
-  if (!rows.length) return "name,email,event,tier,status,checked_in\n";
+// Characters that spreadsheet apps treat as the start of a formula. A leading
+// one must be neutralized or a malicious name/email becomes an executable cell.
+const CSV_FORMULA_PREFIXES = ["=", "+", "-", "@", "\t", "\r"];
 
+function sanitizeCsvField(value) {
+  if (value == null) return '""';
+  let str = String(value);
+  if (CSV_FORMULA_PREFIXES.includes(str[0])) {
+    str = `'${str}`; // prefix with apostrophe so it's treated as text
+  }
+  return `"${str.replace(/"/g, '""')}"`;
+}
+
+async function exportCsv(eventId) {
   const header = "name,email,event,tier,status,checked_in\n";
+  const rows = await reservationRepository.findForExport(eventId);
+  if (!rows.length) return header;
+
   const body = rows
     .map((r) =>
       [r.name, r.email, r.event_name, r.tier_name, r.status, r.checked_in ? "yes" : "no"]
-        .map((v) => (v == null ? '""' : `"${String(v).replace(/"/g, '""')}"`))
+        .map(sanitizeCsvField)
         .join(","),
     )
     .join("\n");
@@ -24,4 +37,4 @@ async function exportCsv(eventId) {
   return header + body;
 }
 
-module.exports = { listCheckins, exportCsv };
+module.exports = { listCheckins, exportCsv, sanitizeCsvField };

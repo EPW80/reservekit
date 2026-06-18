@@ -27,7 +27,11 @@ function auth(roles = []) {
       }
       req.user = payload;
       next();
-    } catch {
+    } catch (err) {
+      if (process.env.NODE_ENV === "development") {
+        // Surface why verification failed while debugging, without leaking to clients.
+        console.error("[auth] token verification failed:", err.message);
+      }
       next({
         status: 401,
         code: "UNAUTHORIZED",

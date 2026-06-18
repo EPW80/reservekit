@@ -17,11 +17,22 @@ module.exports = function errorHandler(err, req, res, next) {
       .json({ data: null, error: { code: "VALIDATION_ERROR", message: err.message } });
   }
 
+  const isDev = process.env.NODE_ENV === "development";
   const code = err.code || "INTERNAL";
   const status = err.status || CODE_STATUS[code] || 500;
-  const message = err.message || "An unexpected error occurred";
 
-  if (status === 500) console.error(err);
+  // For unexpected (500) errors, log the full error but never leak internals
+  // (e.g. Postgres constraint messages) to the client outside development.
+  let message;
+  if (status === 500) {
+    console.error(err);
+    message = isDev ? err.message : "An unexpected error occurred";
+  } else {
+    message = err.message || "An unexpected error occurred";
+  }
 
-  res.status(status).json({ data: null, error: { code, message } });
+  const error = { code, message };
+  if (isDev && err.stack) error.stack = err.stack;
+
+  res.status(status).json({ data: null, error });
 };

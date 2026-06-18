@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const userRepository = require("../repositories/userRepository");
+const { JWT_EXPIRY } = require("../config/constants");
 
 async function login(email, password) {
   const user = await userRepository.findByEmail(email);
@@ -16,7 +17,7 @@ async function login(email, password) {
   const token = jwt.sign(
     { sub: user.id, role: user.role, email: user.email },
     process.env.JWT_SECRET,
-    { expiresIn: "8h" },
+    { expiresIn: JWT_EXPIRY },
   );
 
   return { token };
