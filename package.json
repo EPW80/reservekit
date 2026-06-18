@@ -1,0 +1,47 @@
+{
+  "name": "reservekit",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"nodemon api/server.js\" \"npm --prefix client run dev\"",
+    "db:migrate": "node db/migrate.js",
+    "db:seed": "node db/seed.js",
+    "test": "jest --runInBand --forceExit",
+    "test:unit": "jest --selectProjects unit --forceExit",
+    "lint": "eslint . && npm --prefix client run lint",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "echo \"No TypeScript yet — added in Phase 4\" && exit 0",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-validator": "^7.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.12.0",
+    "qrcode": "^1.5.4",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^9.15.0",
+    "globals": "^15.12.0",
+    "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "lint-staged": "^15.2.10",
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.3",
+    "supertest": "^7.0.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": "eslint --fix",
+    "*.{js,jsx,json,css,md}": "prettier --write"
+  }
+}

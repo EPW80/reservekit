@@ -1,0 +1,12 @@
+{
+  "semi": true,
+  "singleQuote": false,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "overrides": [
+    {
+      "files": "client/**/*.{js,jsx}",
+      "options": { "singleQuote": true }
+    }
+  ]
+}

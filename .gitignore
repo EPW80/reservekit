@@ -1,0 +1,49 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+client/node_modules/
+
+# Build outputs
+client/dist/
+client/build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test coverage
+coverage/
+
+# Uploads (use S3 instead)
+uploads/
+
+# Claude Code — ignore local settings, but track shared skills
+.claude/*
+!.claude/skills/
+
+# Vendored upstream reference clone (not part of this repo's source)
+skills-main/
+
+# Markdown — ignore stray notes, but track project docs and skills
+**/*.md
+!/README.md
+!/CLAUDE.md
+!/CONTEXT.md
+!/docs/
+!/docs/**/*.md
+!/.claude/skills/
+!/.claude/skills/**/*.md
