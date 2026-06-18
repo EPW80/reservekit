@@ -23,6 +23,10 @@ npm run db:seed               # 3 demo events, one sold-out
 npm run dev                   # API :3000 + client :5173
 ```
 
+> The API validates its environment on startup and **refuses to boot** without a
+> valid `DATABASE_URL` and a `JWT_SECRET` that is at least 32 characters and not
+> the placeholder. Generate one with `openssl rand -hex 32`.
+
 ## Commands
 
 ```bash
@@ -31,7 +35,21 @@ npm run db:migrate   # Run /db/migrations in order
 npm run db:seed      # Seed demo data
 npm test             # Unit + integration (needs TEST_DATABASE_URL)
 npm run test:unit    # Unit tests only — no DB required
+npm run lint         # ESLint (api/db/wp-plugin) + client ESLint
+npm run format       # Prettier write across the repo
+npm run format:check # Prettier check (CI gate)
 ```
+
+## Configuration
+
+| Variable                                                                       | Required    | Notes                                                            |
+| ------------------------------------------------------------------------------ | ----------- | ---------------------------------------------------------------- |
+| `DATABASE_URL`                                                                 | yes         | Postgres connection string                                       |
+| `JWT_SECRET`                                                                   | yes         | ≥ 32 chars, not the placeholder — enforced at startup            |
+| `ALLOWED_ORIGINS`                                                              | no          | Comma-separated CORS allowlist (default `http://localhost:5173`) |
+| `NODE_ENV`                                                                     | no          | `development` surfaces error details/stacks in responses         |
+| `PORT`                                                                         | no          | API port (default `3000`)                                        |
+| `AWS_REGION` / `AWS_S3_BUCKET` / `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | for uploads | Only needed for event-image upload to S3                         |
 
 ## API
 
@@ -84,7 +102,8 @@ Routes → Services → Repositories → PostgreSQL / S3
 | `reservations` | `id`, `user_id`, `event_id`, `tier_id`, `status`, `qr_code` (UUID)                       |
 | `checkins`     | `id`, `reservation_id` (unique), `staff_id`, `checked_in_at`                             |
 
-See `/docs/erd.png` for the full ERD.
+See `db/migrations/` for the authoritative schema and `CONTEXT.md` for the
+domain glossary. (A rendered ERD is planned.)
 
 ## Key Behaviors
 
@@ -93,7 +112,21 @@ See `/docs/erd.png` for the full ERD.
 - **Transactional check-in** — checkin insert + reservation status update run in a single DB transaction.
 - **Sold-out badge** — event list computes `sold_out` from tier capacity data (all tiers full).
 - **Upload limits** — image uploads capped at 10 MB; image MIME types only.
-- **CSV export** — nulls render as empty fields; double quotes are escaped.
+- **CSV export** — nulls render as empty fields, double quotes are escaped, and
+  leading formula characters (`= + - @`) are neutralized to prevent CSV injection.
+
+## Security
+
+- **CORS allowlist** — only origins in `ALLOWED_ORIGINS` get CORS headers; others
+  are blocked by the browser. Non-browser clients (no `Origin`) are unaffected.
+- **Helmet** — standard hardening headers; `x-powered-by` removed.
+- **Rate limiting** — a global limiter plus a stricter limiter on `POST /auth/login`
+  to blunt brute force / credential stuffing.
+- **Body limit** — JSON request bodies capped at 10 KB.
+- **Startup validation** — the API fails fast on missing/weak `JWT_SECRET` or
+  missing `DATABASE_URL`.
+- **Error hygiene** — `500` responses never leak internals (e.g. SQL constraint
+  text) outside `development`.
 
 ## WordPress Plugin
 
@@ -106,3 +139,17 @@ Configure API URL in **WP Admin → Settings → ReserveKit** or `define('RESERV
 ## Demo Mode
 
 Seed data includes one sold-out event. Check-in dashboard has a mock QR scan button for demoing the full flow without hardware.
+
+## Tooling & Conventions
+
+- **Lint / format** — ESLint (root config for `api/`, `db/`, `wp-plugin/`; the
+  client has its own) and Prettier. Run `npm run lint` and `npm run format`.
+- **Pre-commit** — Husky + lint-staged run ESLint/Prettier on staged files and the
+  unit tests before each commit.
+- **CI** — GitHub Actions (`.github/workflows/ci.yml`) runs lint + format check,
+  the full test suite against a Postgres service, a client build, and `npm audit`.
+- **Docs** — `CONTEXT.md` (domain glossary) and `docs/adr/` (architecture decision
+  records) capture the language and the load-bearing decisions. `CLAUDE.md` and
+  `docs/agents/` configure the repo's AI engineering skills.
+- **Tests** — Jest with two projects: `unit` (no DB) and `integration` (needs a
+  Postgres pointed at by `TEST_DATABASE_URL`; migrations run automatically).
