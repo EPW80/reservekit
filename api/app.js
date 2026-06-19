@@ -2,12 +2,15 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const pinoHttp = require("pino-http");
 
 const {
   JSON_BODY_LIMIT,
   GLOBAL_RATE_LIMIT_WINDOW_MS,
   GLOBAL_RATE_LIMIT_MAX,
 } = require("./config/constants");
+const logger = require("./config/logger");
+const db = require("./config/db");
 
 const authRoutes = require("./routes/auth");
 const eventRoutes = require("./routes/events");
@@ -20,6 +23,21 @@ const app = express();
 
 // Trust the reverse proxy so rate-limit / secure cookies see the real client IP.
 app.set("trust proxy", 1);
+
+// Structured per-request logging (silent under test via the logger's level).
+app.use(pinoHttp({ logger }));
+
+// Liveness/readiness probe — pings the DB. Defined before rate limiting and the
+// /api routes so orchestrator health checks are never throttled. Returns a bare
+// status object (not the API envelope) since it's an infra endpoint.
+app.get("/health", async (req, res) => {
+  try {
+    await db.query("SELECT 1");
+    res.json({ status: "ok", uptime: process.uptime() });
+  } catch {
+    res.status(503).json({ status: "error" });
+  }
+});
 
 app.use(helmet());
 

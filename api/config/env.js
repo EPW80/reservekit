@@ -1,4 +1,5 @@
 const { JWT_SECRET_MIN_LENGTH } = require("./constants");
+const logger = require("./logger");
 
 /**
  * Validate environment configuration at startup and fail fast on misconfig.
@@ -33,9 +34,9 @@ function validateEnv(env = process.env) {
 
   const uploadVars = ["AWS_S3_BUCKET", "AWS_REGION", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"];
   const missingUpload = uploadVars.filter((v) => !env[v]);
-  if (missingUpload.length && process.env.NODE_ENV !== "test") {
-    console.warn(
-      `[env] Missing AWS upload vars (${missingUpload.join(", ")}) — image upload will fail until set.`,
+  if (missingUpload.length) {
+    logger.warn(
+      `Missing AWS upload vars (${missingUpload.join(", ")}) — image upload will fail until set.`,
     );
   }
 }

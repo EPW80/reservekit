@@ -1,9 +1,12 @@
 const { Pool } = require("pg");
+const logger = require("./logger");
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
+// Errors on idle clients are unexpected (e.g. the DB dropped the connection).
+// Log them with full context; the pool recovers by creating new clients.
 pool.on("error", (err) => {
-  console.error("Unexpected pg pool error", err);
+  logger.error({ err }, "Unexpected idle pg client error");
 });
 
 /**

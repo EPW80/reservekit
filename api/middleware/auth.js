@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const logger = require("../config/logger");
 
 /**
  * Returns middleware that verifies JWT and optionally restricts to given roles.
@@ -28,10 +29,8 @@ function auth(roles = []) {
       req.user = payload;
       next();
     } catch (err) {
-      if (process.env.NODE_ENV === "development") {
-        // Surface why verification failed while debugging, without leaking to clients.
-        console.error("[auth] token verification failed:", err.message);
-      }
+      // Surface why verification failed for debugging, without leaking to clients.
+      logger.debug({ err: err.message }, "token verification failed");
       next({
         status: 401,
         code: "UNAUTHORIZED",

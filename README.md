@@ -71,6 +71,10 @@ Base: `http://localhost:3000/api`
 | GET    | `/admin/events/:id/checkins` | Admin         | Check-in list                                         |
 | GET    | `/admin/export?event_id=`    | Admin         | Download attendee CSV                                 |
 
+**Health check:** `GET /health` (outside `/api`) pings the DB and returns
+`{ "status": "ok", "uptime": <seconds> }` (503 if the DB is unreachable). Not
+rate-limited; intended for load-balancer / orchestrator probes.
+
 **Response envelope:** `{ "data": ..., "error": null }` or `{ "data": null, "error": { "code", "message" } }`
 
 **Error codes:** `VALIDATION_ERROR` (400) · `UNAUTHORIZED` (401) · `FORBIDDEN` (403) · `NOT_FOUND` (404) · `CONFLICT` (409) · `INTERNAL` (500)
@@ -153,3 +157,7 @@ Seed data includes one sold-out event. Check-in dashboard has a mock QR scan but
   `docs/agents/` configure the repo's AI engineering skills.
 - **Tests** — Jest with two projects: `unit` (no DB) and `integration` (needs a
   Postgres pointed at by `TEST_DATABASE_URL`; migrations run automatically).
+- **Logging** — structured JSON logs via `pino` (+ `pino-http` request logging);
+  level follows `LOG_LEVEL`/`NODE_ENV` and is silent under test.
+- **Graceful shutdown** — on `SIGTERM`/`SIGINT` the server drains in-flight
+  requests and closes the DB pool before exiting (10s force-exit fallback).

@@ -1,4 +1,5 @@
 const multer = require("multer");
+const logger = require("../config/logger");
 
 const CODE_STATUS = {
   VALIDATION_ERROR: 400,
@@ -25,7 +26,7 @@ module.exports = function errorHandler(err, req, res, next) {
   // (e.g. Postgres constraint messages) to the client outside development.
   let message;
   if (status === 500) {
-    console.error(err);
+    logger.error({ err }, "Unhandled error");
     message = isDev ? err.message : "An unexpected error occurred";
   } else {
     message = err.message || "An unexpected error occurred";
