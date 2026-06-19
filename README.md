@@ -4,14 +4,14 @@ Full-stack event reservation and multi-tier ticketing platform.
 
 ## Stack
 
-| Layer    | Technology                                    |
-| -------- | --------------------------------------------- |
-| API      | Node.js + Express (REST, repository pattern)  |
-| Frontend | React + Tailwind (Vite)                       |
-| Database | PostgreSQL — raw `pg` queries, no ORM         |
-| Storage  | AWS S3 (event images)                         |
-| Auth     | JWT + bcrypt                                  |
-| WP       | PHP shortcode plugin proxying to the Node API |
+| Layer    | Technology                                                                           |
+| -------- | ------------------------------------------------------------------------------------ |
+| API      | Node.js + Express (REST, repository pattern; migrating to TypeScript, run via `tsx`) |
+| Frontend | React + Tailwind (Vite)                                                              |
+| Database | PostgreSQL — raw `pg` queries, no ORM                                                |
+| Storage  | AWS S3 (event images)                                                                |
+| Auth     | JWT + bcrypt                                                                         |
+| WP       | PHP shortcode plugin proxying to the Node API                                        |
 
 ## Quick Start
 
@@ -46,6 +46,7 @@ npm run db:seed      # Seed demo data
 npm test             # Unit + integration (needs TEST_DATABASE_URL)
 npm run test:unit    # Unit tests only — no DB required
 npm run lint         # ESLint (api/db/wp-plugin) + client ESLint
+npm run typecheck    # tsc --noEmit (TypeScript, allowJs)
 npm run format       # Prettier write across the repo
 npm run format:check # Prettier check (CI gate)
 ```
@@ -185,6 +186,9 @@ Hardening is rolling out in phases (each lands on its own branch):
   logging, foreign-key indexes.
 - ✅ **Phase 3 — Client**: Vitest + React Testing Library, error boundary,
   `jwt-decode` with expiry, auth-storage hardening (see ADR 0003).
-- ⬜ **Phase 4 — TypeScript**: incremental migration of API and client.
+- 🚧 **Phase 4 — TypeScript**: foundation in place (tsconfig, `tsx` runtime,
+  `tsc` typecheck in CI + pre-commit, ts-jest); API config/helpers migrated.
+  Remaining API and client modules migrate incrementally (`allowJs` keeps JS
+  working throughout).
 - ⬜ **Phase 5 — Dependencies & polish**: dependency updates, presigned S3 URLs,
   password strength, API error-code docs.

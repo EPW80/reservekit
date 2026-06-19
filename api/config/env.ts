@@ -1,5 +1,5 @@
-const { JWT_SECRET_MIN_LENGTH } = require("./constants");
-const logger = require("./logger");
+import { JWT_SECRET_MIN_LENGTH } from "./constants";
+import logger from "./logger";
 
 /**
  * Validate environment configuration at startup and fail fast on misconfig.
@@ -11,8 +11,8 @@ const logger = require("./logger");
  * Called from server.js — not during tests, which set their own env in
  * jest.config.js and exercise the app directly.
  */
-function validateEnv(env = process.env) {
-  const errors = [];
+export function validateEnv(env: NodeJS.ProcessEnv = process.env): void {
+  const errors: string[] = [];
 
   if (!env.DATABASE_URL) {
     errors.push("DATABASE_URL is required");
@@ -40,5 +40,3 @@ function validateEnv(env = process.env) {
     );
   }
 }
-
-module.exports = { validateEnv };

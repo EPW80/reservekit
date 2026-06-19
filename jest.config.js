@@ -6,6 +6,13 @@ process.env.DATABASE_URL =
   process.env.TEST_DATABASE_URL || "postgres://localhost:5432/reservekit_test";
 process.env.JWT_SECRET = "test-jwt-secret";
 
+// Transform TypeScript sources required by the (still JS) test files. Type
+// errors are caught separately by `npm run typecheck`, so ts-jest only transpiles.
+const tsTransform = {
+  "^.+\\.ts$": ["ts-jest", { diagnostics: false }],
+};
+const moduleFileExtensions = ["ts", "js", "json", "node"];
+
 module.exports = {
   forceExit: true,
 
@@ -20,6 +27,8 @@ module.exports = {
       displayName: "unit",
       testEnvironment: "node",
       testMatch: ["<rootDir>/api/tests/unit/**/*.test.js"],
+      transform: tsTransform,
+      moduleFileExtensions,
     },
     {
       displayName: "integration",
@@ -27,6 +36,8 @@ module.exports = {
       testMatch: ["<rootDir>/api/tests/integration/**/*.test.js"],
       globalSetup: "<rootDir>/api/tests/globalSetup.js",
       globalTeardown: "<rootDir>/api/tests/globalTeardown.js",
+      transform: tsTransform,
+      moduleFileExtensions,
     },
   ],
 };
