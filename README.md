@@ -18,6 +18,13 @@ Full-stack event reservation and multi-tier ticketing platform.
 ```bash
 npm install && npm --prefix client install
 cp .env.example .env          # fill in DB, JWT, AWS creds
+
+# Need a Postgres? Spin one up with Docker (use a free host port if 5432 is taken):
+docker run -d --name reservekit-pg \
+  -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=reservekit \
+  -p 5432:5432 postgres:16
+# then set DATABASE_URL=postgres://postgres:postgres@localhost:5432/reservekit in .env
+
 npm run db:migrate
 npm run db:seed               # 3 demo events, one sold-out
 npm run dev                   # API :3000 + client :5173
@@ -26,6 +33,9 @@ npm run dev                   # API :3000 + client :5173
 > The API validates its environment on startup and **refuses to boot** without a
 > valid `DATABASE_URL` and a `JWT_SECRET` that is at least 32 characters and not
 > the placeholder. Generate one with `openssl rand -hex 32`.
+
+**Demo logins** (from the seed): `admin@reservekit.dev` / `admin123` ·
+`staff@reservekit.dev` / `staff123` · `alice@example.com` / `user123`.
 
 ## Commands
 
@@ -161,3 +171,19 @@ Seed data includes one sold-out event. Check-in dashboard has a mock QR scan but
   level follows `LOG_LEVEL`/`NODE_ENV` and is silent under test.
 - **Graceful shutdown** — on `SIGTERM`/`SIGINT` the server drains in-flight
   requests and closes the DB pool before exiting (10s force-exit fallback).
+
+## Roadmap
+
+Hardening is rolling out in phases (each lands on its own branch):
+
+- ✅ **Phase 0 — Foundations**: ESLint/Prettier, Husky pre-commit, GitHub Actions
+  CI, `CONTEXT.md` + ADRs, agent skills.
+- ✅ **Phase 1 — Security**: CORS allowlist, helmet, rate limiting, startup env
+  validation, CSV-injection fix, error hygiene.
+- ✅ **Phase 2 — DevOps & resilience**: `/health`, graceful shutdown, structured
+  logging, foreign-key indexes.
+- ⬜ **Phase 3 — Client**: Vitest + React Testing Library, error boundary,
+  `jwt-decode` with expiry, auth-storage hardening.
+- ⬜ **Phase 4 — TypeScript**: incremental migration of API and client.
+- ⬜ **Phase 5 — Dependencies & polish**: dependency updates, presigned S3 URLs,
+  password strength, API error-code docs.
