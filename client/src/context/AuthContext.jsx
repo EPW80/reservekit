@@ -1,33 +1,22 @@
 import { useState } from 'react';
 import { AuthContext } from './auth.js';
+import { TOKEN_KEY, decodeValidToken, loadStoredToken } from './token.js';
 import api from '../api/client.js';
 
-function decodeToken(token) {
-  try {
-    const payload = token.split('.')[1];
-    return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-  } catch {
-    return null;
-  }
-}
-
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem('rk_token'));
-  const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('rk_token');
-    return stored ? decodeToken(stored) : null;
-  });
+  const [token, setToken] = useState(loadStoredToken);
+  const [user, setUser] = useState(() => decodeValidToken(token));
 
   async function login(email, password) {
     const { data } = await api.post('/auth/login', { email, password });
     const jwt = data.data.token;
-    localStorage.setItem('rk_token', jwt);
+    localStorage.setItem(TOKEN_KEY, jwt);
     setToken(jwt);
-    setUser(decodeToken(jwt));
+    setUser(decodeValidToken(jwt));
   }
 
   function logout() {
-    localStorage.removeItem('rk_token');
+    localStorage.removeItem(TOKEN_KEY);
     setToken(null);
     setUser(null);
   }

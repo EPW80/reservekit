@@ -26,4 +26,11 @@ export default defineConfig([
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
+  {
+    // Vitest test files and the test setup use test-runner globals.
+    files: ['**/*.{test,spec}.{js,jsx}', 'src/test/**/*.{js,jsx}'],
+    languageOptions: {
+      globals: { ...globals.jest, vi: 'readonly', vitest: 'readonly' },
+    },
+  },
 ]);

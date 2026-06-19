@@ -165,8 +165,9 @@ Seed data includes one sold-out event. Check-in dashboard has a mock QR scan but
 - **Docs** — `CONTEXT.md` (domain glossary) and `docs/adr/` (architecture decision
   records) capture the language and the load-bearing decisions. `CLAUDE.md` and
   `docs/agents/` configure the repo's AI engineering skills.
-- **Tests** — Jest with two projects: `unit` (no DB) and `integration` (needs a
-  Postgres pointed at by `TEST_DATABASE_URL`; migrations run automatically).
+- **Tests** — API: Jest with two projects, `unit` (no DB) and `integration`
+  (needs a Postgres pointed at by `TEST_DATABASE_URL`; migrations run
+  automatically). Client: Vitest + React Testing Library (`npm test --prefix client`).
 - **Logging** — structured JSON logs via `pino` (+ `pino-http` request logging);
   level follows `LOG_LEVEL`/`NODE_ENV` and is silent under test.
 - **Graceful shutdown** — on `SIGTERM`/`SIGINT` the server drains in-flight
@@ -182,8 +183,8 @@ Hardening is rolling out in phases (each lands on its own branch):
   validation, CSV-injection fix, error hygiene.
 - ✅ **Phase 2 — DevOps & resilience**: `/health`, graceful shutdown, structured
   logging, foreign-key indexes.
-- ⬜ **Phase 3 — Client**: Vitest + React Testing Library, error boundary,
-  `jwt-decode` with expiry, auth-storage hardening.
+- ✅ **Phase 3 — Client**: Vitest + React Testing Library, error boundary,
+  `jwt-decode` with expiry, auth-storage hardening (see ADR 0003).
 - ⬜ **Phase 4 — TypeScript**: incremental migration of API and client.
 - ⬜ **Phase 5 — Dependencies & polish**: dependency updates, presigned S3 URLs,
   password strength, API error-code docs.
