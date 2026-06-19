@@ -1,9 +1,9 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const userRepository = require("../repositories/userRepository");
-const { JWT_EXPIRY } = require("../config/constants");
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import * as userRepository from "../repositories/userRepository";
+import { JWT_EXPIRY } from "../config/constants";
 
-async function login(email, password) {
+export async function login(email: string, password: string): Promise<{ token: string }> {
   const user = await userRepository.findByEmail(email);
   if (!user) {
     throw { status: 401, code: "UNAUTHORIZED", message: "Invalid credentials" };
@@ -16,11 +16,9 @@ async function login(email, password) {
 
   const token = jwt.sign(
     { sub: user.id, role: user.role, email: user.email },
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET as string,
     { expiresIn: JWT_EXPIRY },
   );
 
   return { token };
 }
-
-module.exports = { login };

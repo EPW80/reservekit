@@ -1,23 +1,23 @@
-const express = require("express");
-const cors = require("cors");
-const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
-const pinoHttp = require("pino-http");
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import pinoHttp from "pino-http";
 
-const {
+import {
   JSON_BODY_LIMIT,
   GLOBAL_RATE_LIMIT_WINDOW_MS,
   GLOBAL_RATE_LIMIT_MAX,
-} = require("./config/constants");
-const logger = require("./config/logger");
-const db = require("./config/db");
+} from "./config/constants";
+import logger from "./config/logger";
+import db from "./config/db";
 
-const authRoutes = require("./routes/auth");
-const eventRoutes = require("./routes/events");
-const reservationRoutes = require("./routes/reservations");
-const checkinRoutes = require("./routes/checkins");
-const adminRoutes = require("./routes/admin");
-const errorHandler = require("./middleware/error");
+import authRoutes from "./routes/auth";
+import eventRoutes from "./routes/events";
+import reservationRoutes from "./routes/reservations";
+import checkinRoutes from "./routes/checkins";
+import adminRoutes from "./routes/admin";
+import errorHandler from "./middleware/error";
 
 const app = express();
 
@@ -30,7 +30,7 @@ app.use(pinoHttp({ logger }));
 // Liveness/readiness probe — pings the DB. Defined before rate limiting and the
 // /api routes so orchestrator health checks are never throttled. Returns a bare
 // status object (not the API envelope) since it's an infra endpoint.
-app.get("/health", async (req, res) => {
+app.get("/health", async (_req, res) => {
   try {
     await db.query("SELECT 1");
     res.json({ status: "ok", uptime: process.uptime() });
@@ -72,11 +72,12 @@ if (process.env.NODE_ENV !== "test") {
       max: GLOBAL_RATE_LIMIT_MAX,
       standardHeaders: true,
       legacyHeaders: false,
-      handler: (req, res) =>
+      handler: (_req, res) => {
         res.status(429).json({
           data: null,
           error: { code: "RATE_LIMITED", message: "Too many requests, please try again later" },
-        }),
+        });
+      },
     }),
   );
 }
@@ -89,4 +90,4 @@ app.use("/api/admin", adminRoutes);
 
 app.use(errorHandler);
 
-module.exports = app;
+export = app;

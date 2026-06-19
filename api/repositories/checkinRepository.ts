@@ -1,17 +1,22 @@
-const db = require("../config/db");
+import { PoolClient } from "pg";
+import db from "../config/db";
+import type { Checkin } from "../types";
 
-async function create({ reservation_id, staff_id }, client) {
+export async function create(
+  input: { reservation_id: number; staff_id: number },
+  client?: PoolClient,
+): Promise<Checkin> {
   const conn = client || db;
   const { rows } = await conn.query(
     `INSERT INTO checkins (reservation_id, staff_id)
      VALUES ($1, $2)
      RETURNING *`,
-    [reservation_id, staff_id],
+    [input.reservation_id, input.staff_id],
   );
   return rows[0];
 }
 
-async function findByReservationId(reservationId) {
+export async function findByReservationId(reservationId: number): Promise<Checkin | null> {
   const { rows } = await db.query(
     `SELECT id, reservation_id, staff_id, checked_in_at
      FROM checkins WHERE reservation_id = $1`,
@@ -20,7 +25,15 @@ async function findByReservationId(reservationId) {
   return rows[0] || null;
 }
 
-async function findByEventId(eventId) {
+export interface EventCheckinRow {
+  id: number;
+  checked_in_at: string;
+  attendee_email: string;
+  staff_email: string;
+  tier_name: string;
+}
+
+export async function findByEventId(eventId: number): Promise<EventCheckinRow[]> {
   const { rows } = await db.query(
     `SELECT c.id, c.checked_in_at,
             u.email  AS attendee_email,
@@ -37,5 +50,3 @@ async function findByEventId(eventId) {
   );
   return rows;
 }
-
-module.exports = { create, findByReservationId, findByEventId };

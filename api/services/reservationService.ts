@@ -1,8 +1,10 @@
-const { v4: uuidv4 } = require("uuid");
-const reservationRepository = require("../repositories/reservationRepository");
-const tierRepository = require("../repositories/tierRepository");
+import { v4 as uuidv4 } from "uuid";
+import * as reservationRepository from "../repositories/reservationRepository";
+import * as tierRepository from "../repositories/tierRepository";
+import type { JwtUser } from "../types";
 
-async function create(user, { event_id, tier_id }) {
+export async function create(user: JwtUser, body: { event_id: number; tier_id: number }) {
+  const { event_id, tier_id } = body;
   const tier = await tierRepository.findById(tier_id);
   if (!tier) throw { status: 404, code: "NOT_FOUND", message: "Tier not found" };
   if (tier.event_id !== event_id) {
@@ -16,7 +18,7 @@ async function create(user, { event_id, tier_id }) {
   return reservationRepository.create({ user_id: user.sub, event_id, tier_id, qr_code });
 }
 
-async function getById(user, id) {
+export async function getById(user: JwtUser, id: number) {
   const reservation = await reservationRepository.findById(id);
   if (!reservation) throw { status: 404, code: "NOT_FOUND", message: "Reservation not found" };
   if (reservation.user_id !== user.sub && user.role !== "admin") {
@@ -25,9 +27,7 @@ async function getById(user, id) {
   return reservation;
 }
 
-async function getQr(user, id) {
+export async function getQr(user: JwtUser, id: number) {
   const reservation = await getById(user, id);
   return { qr_code: reservation.qr_code };
 }
-
-module.exports = { create, getById, getQr };

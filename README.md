@@ -102,7 +102,7 @@ Routes → Services → Repositories → PostgreSQL / S3
 | `api/services/`     | Business logic, transaction orchestration |
 | `api/repositories/` | Raw SQL via `pg`                          |
 | `api/middleware/`   | JWT auth, validation, error handling      |
-| `api/config/db.js`  | Pool + `withTransaction()` helper         |
+| `api/config/db.ts`  | Pool + `withTransaction()` helper         |
 | `db/migrations/`    | Ordered `.sql` schema files               |
 | `client/`           | Vite + React SPA                          |
 | `wp-plugin/`        | WordPress shortcode → REST proxy          |
@@ -187,8 +187,9 @@ Hardening is rolling out in phases (each lands on its own branch):
 - ✅ **Phase 3 — Client**: Vitest + React Testing Library, error boundary,
   `jwt-decode` with expiry, auth-storage hardening (see ADR 0003).
 - 🚧 **Phase 4 — TypeScript**: foundation in place (tsconfig, `tsx` runtime,
-  `tsc` typecheck in CI + pre-commit, ts-jest); API config/helpers migrated.
-  Remaining API and client modules migrate incrementally (`allowJs` keeps JS
-  working throughout).
+  `tsc` typecheck in CI + pre-commit, ts-jest). **The entire `api/` is now
+  TypeScript** (config → repositories → services → middleware → routes →
+  app/server, plus shared domain types). The client (`.jsx`→`.tsx`) migrates
+  next; `allowJs` keeps any remaining JS working.
 - ⬜ **Phase 5 — Dependencies & polish**: dependency updates, presigned S3 URLs,
   password strength, API error-code docs.

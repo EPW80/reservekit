@@ -1,9 +1,9 @@
-const { Router } = require("express");
-const { param, query } = require("express-validator");
-const validate = require("../middleware/validate");
-const auth = require("../middleware/auth");
-const adminService = require("../services/adminService");
-const { success } = require("../helpers/response");
+import { Router, Request, Response, NextFunction } from "express";
+import { param, query } from "express-validator";
+import validate from "../middleware/validate";
+import auth from "../middleware/auth";
+import * as adminService from "../services/adminService";
+import { success } from "../helpers/response";
 
 const router = Router();
 
@@ -13,7 +13,7 @@ router.get(
   auth(["admin"]),
   [param("id").isInt()],
   validate,
-  async (req, res, next) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = await adminService.listCheckins(Number(req.params.id));
       res.json(success(data));
@@ -29,7 +29,7 @@ router.get(
   auth(["admin"]),
   [query("event_id").optional().isInt()],
   validate,
-  async (req, res, next) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const csv = await adminService.exportCsv(
         req.query.event_id ? Number(req.query.event_id) : undefined,
@@ -43,4 +43,4 @@ router.get(
   },
 );
 
-module.exports = router;
+export = router;

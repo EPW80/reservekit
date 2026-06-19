@@ -1,6 +1,7 @@
-const db = require("../config/db");
+import db from "../config/db";
+import type { Tier } from "../types";
 
-async function findByEventId(eventId) {
+export async function findByEventId(eventId: number): Promise<Tier[]> {
   const { rows } = await db.query(
     `SELECT id, event_id, name, price, capacity, sold_count
      FROM tiers WHERE event_id = $1 ORDER BY price ASC`,
@@ -9,7 +10,7 @@ async function findByEventId(eventId) {
   return rows;
 }
 
-async function findById(id) {
+export async function findById(id: number): Promise<Tier | null> {
   const { rows } = await db.query(
     `SELECT id, event_id, name, price, capacity, sold_count
      FROM tiers WHERE id = $1`,
@@ -18,7 +19,13 @@ async function findById(id) {
   return rows[0] || null;
 }
 
-async function create({ event_id, name, price, capacity }) {
+export async function create(input: {
+  event_id: number;
+  name: string;
+  price: number | string;
+  capacity: number;
+}): Promise<Tier> {
+  const { event_id, name, price, capacity } = input;
   const { rows } = await db.query(
     `INSERT INTO tiers (event_id, name, price, capacity)
      VALUES ($1, $2, $3, $4)
@@ -28,8 +35,8 @@ async function create({ event_id, name, price, capacity }) {
   return rows[0];
 }
 
-// Atomically increments sold_count; throws CONFLICT if tier is sold out.
-async function decrementCapacity(id) {
+// Atomically increments sold_count; throws CONFLICT if the tier is sold out.
+export async function decrementCapacity(id: number): Promise<Tier> {
   const { rows } = await db.query(
     `UPDATE tiers SET sold_count = sold_count + 1
      WHERE id = $1 AND sold_count < capacity
@@ -41,5 +48,3 @@ async function decrementCapacity(id) {
   }
   return rows[0];
 }
-
-module.exports = { findByEventId, findById, create, decrementCapacity };

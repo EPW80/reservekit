@@ -1,8 +1,8 @@
-const checkinRepository = require("../repositories/checkinRepository");
-const reservationRepository = require("../repositories/reservationRepository");
-const eventRepository = require("../repositories/eventRepository");
+import * as checkinRepository from "../repositories/checkinRepository";
+import * as reservationRepository from "../repositories/reservationRepository";
+import * as eventRepository from "../repositories/eventRepository";
 
-async function listCheckins(eventId) {
+export async function listCheckins(eventId: number) {
   const event = await eventRepository.findById(eventId);
   if (!event) throw { status: 404, code: "NOT_FOUND", message: "Event not found" };
   return checkinRepository.findByEventId(eventId);
@@ -12,7 +12,7 @@ async function listCheckins(eventId) {
 // one must be neutralized or a malicious name/email becomes an executable cell.
 const CSV_FORMULA_PREFIXES = ["=", "+", "-", "@", "\t", "\r"];
 
-function sanitizeCsvField(value) {
+export function sanitizeCsvField(value: unknown): string {
   if (value == null) return '""';
   let str = String(value);
   if (CSV_FORMULA_PREFIXES.includes(str[0])) {
@@ -21,7 +21,7 @@ function sanitizeCsvField(value) {
   return `"${str.replace(/"/g, '""')}"`;
 }
 
-async function exportCsv(eventId) {
+export async function exportCsv(eventId?: number): Promise<string> {
   const header = "name,email,event,tier,status,checked_in\n";
   const rows = await reservationRepository.findForExport(eventId);
   if (!rows.length) return header;
@@ -36,5 +36,3 @@ async function exportCsv(eventId) {
 
   return header + body;
 }
-
-module.exports = { listCheckins, exportCsv, sanitizeCsvField };
