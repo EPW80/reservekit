@@ -1,15 +1,24 @@
-import { Component } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+}
 
 // Catches render-time errors anywhere below it so a single broken component
 // shows a fallback instead of unmounting the whole app to a blank screen.
-export default class ErrorBoundary extends Component {
-  state = { hasError: false };
+export default class ErrorBoundary extends Component<Props, State> {
+  state: State = { hasError: false };
 
-  static getDerivedStateFromError() {
+  static getDerivedStateFromError(): State {
     return { hasError: true };
   }
 
-  componentDidCatch(error, info) {
+  componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('Unhandled UI error:', error, info);
   }
 

@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
-import api from '../api/client.js';
+import api from '../api/client';
+import type { Reservation } from '../types';
 
 export default function ReservationConfirmPage() {
   const { id } = useParams();
 
-  const [reservation, setReservation] = useState(null);
-  const [qrCode, setQrCode] = useState(null);
+  const [reservation, setReservation] = useState<Reservation | null>(null);
+  const [qrCode, setQrCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -73,16 +74,16 @@ export default function ReservationConfirmPage() {
           <div className="text-left bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
             <div className="flex justify-between gap-2">
               <span className="text-gray-500">Reservation</span>
-              <span className="font-mono text-xs text-gray-600">#{reservation.id}</span>
+              <span className="font-mono text-xs text-gray-600">#{reservation!.id}</span>
             </div>
             <div className="flex justify-between gap-2">
               <span className="text-gray-500">Status</span>
-              <span className="font-medium text-gray-900 capitalize">{reservation.status}</span>
+              <span className="font-medium text-gray-900 capitalize">{reservation!.status}</span>
             </div>
             <div className="flex justify-between gap-2">
               <span className="text-gray-500">Date</span>
               <span className="text-gray-700">
-                {new Date(reservation.created_at).toLocaleDateString(undefined, {
+                {new Date(reservation!.created_at).toLocaleDateString(undefined, {
                   dateStyle: 'medium',
                 })}
               </span>

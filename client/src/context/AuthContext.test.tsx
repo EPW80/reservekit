@@ -1,17 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { AuthProvider } from './AuthContext.jsx';
-import { decodeValidToken } from './token.js';
-import { useAuth } from '../hooks/useAuth.js';
-import api from '../api/client.js';
+import { AuthProvider } from './AuthContext';
+import { decodeValidToken } from './token';
+import { useAuth } from '../hooks/useAuth';
+import api from '../api/client';
 
-vi.mock('../api/client.js', () => ({ default: { post: vi.fn(), get: vi.fn() } }));
+vi.mock('../api/client', () => ({ default: { post: vi.fn(), get: vi.fn() } }));
+const mockPost = vi.mocked(api.post);
 
 const now = () => Math.floor(Date.now() / 1000);
-const b64url = (obj) =>
+const b64url = (obj: object) =>
   btoa(JSON.stringify(obj)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-const makeToken = (payload) => `h.${b64url(payload)}.s`;
+const makeToken = (payload: object) => `h.${b64url(payload)}.s`;
 
 function Harness() {
   const { user, token, login, logout } = useAuth();
@@ -71,7 +72,7 @@ describe('AuthProvider', () => {
 
   it('logs in (storing the token) and logs out (clearing it)', async () => {
     const jwt = makeToken({ email: 'a@b.c', exp: now() + 3600 });
-    api.post.mockResolvedValue({ data: { data: { token: jwt } } });
+    mockPost.mockResolvedValue({ data: { data: { token: jwt } } } as any);
 
     renderProvider();
     await userEvent.click(screen.getByText('login'));

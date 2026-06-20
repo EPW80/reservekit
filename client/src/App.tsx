@@ -1,11 +1,12 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './hooks/useAuth.js';
-import LoginPage from './pages/LoginPage.jsx';
-import EventsPage from './pages/EventsPage.jsx';
-import EventDetailPage from './pages/EventDetailPage.jsx';
-import ReservationConfirmPage from './pages/ReservationConfirmPage.jsx';
+import type { ReactNode } from 'react';
+import { useAuth } from './hooks/useAuth';
+import LoginPage from './pages/LoginPage';
+import EventsPage from './pages/EventsPage';
+import EventDetailPage from './pages/EventDetailPage';
+import ReservationConfirmPage from './pages/ReservationConfirmPage';
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children }: { children: ReactNode }) {
   const { token } = useAuth();
   return token ? children : <Navigate to="/login" replace />;
 }

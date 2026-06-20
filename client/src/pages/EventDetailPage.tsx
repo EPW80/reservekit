@@ -1,9 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import api from '../api/client.js';
-import { useAuth } from '../hooks/useAuth.js';
+import api from '../api/client';
+import { useAuth } from '../hooks/useAuth';
+import { apiErrorCode } from '../lib/apiError';
+import type { EventSummary, Tier } from '../types';
 
-function TierRow({ tier, onReserve, reserving }) {
+function TierRow({
+  tier,
+  onReserve,
+  reserving,
+}: {
+  tier: Tier;
+  onReserve: (id: number) => void;
+  reserving: number | null;
+}) {
   const available = tier.capacity - tier.sold_count;
   const soldOut = available <= 0;
 
@@ -36,12 +46,12 @@ export default function EventDetailPage() {
   const navigate = useNavigate();
   const { token } = useAuth();
 
-  const [event, setEvent] = useState(null);
-  const [tiers, setTiers] = useState([]);
+  const [event, setEvent] = useState<EventSummary | null>(null);
+  const [tiers, setTiers] = useState<Tier[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [reserving, setReserving] = useState(null);
-  const [reserveError, setReserveError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const [reserving, setReserving] = useState<number | null>(null);
+  const [reserveError, setReserveError] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -54,13 +64,13 @@ export default function EventDetailPage() {
         setTiers(tiersData);
       })
       .catch((err) => {
-        const code = err.response?.data?.error?.code;
+        const code = apiErrorCode(err);
         setError(code === 'NOT_FOUND' ? 'Event not found.' : 'Failed to load event.');
       })
       .finally(() => setLoading(false));
   }, [id]);
 
-  async function handleReserve(tierId) {
+  async function handleReserve(tierId: number) {
     if (!token) {
       navigate('/login', { state: { from: { pathname: `/events/${id}` } } });
       return;
@@ -74,7 +84,7 @@ export default function EventDetailPage() {
       });
       navigate(`/reservations/${data.data.id}/confirm`);
     } catch (err) {
-      const code = err.response?.data?.error?.code;
+      const code = apiErrorCode(err);
       setReserveError(
         code === 'CONFLICT' ? 'This tier is sold out.' : 'Reservation failed. Please try again.',
       );
@@ -108,29 +118,29 @@ export default function EventDetailPage() {
         ← All events
       </Link>
 
-      {event.image_url && (
+      {event!.image_url && (
         <img
-          src={event.image_url}
-          alt={event.title}
+          src={event!.image_url}
+          alt={event!.title}
           className="w-full h-56 object-cover rounded-2xl mb-6"
         />
       )}
 
-      <h1 className="text-3xl font-bold text-gray-900">{event.title}</h1>
+      <h1 className="text-3xl font-bold text-gray-900">{event!.title}</h1>
 
       <div className="mt-2 text-sm text-gray-500 space-y-0.5">
-        {event.date && (
+        {event!.date && (
           <p>
-            {new Date(event.date).toLocaleDateString(undefined, {
+            {new Date(event!.date).toLocaleDateString(undefined, {
               dateStyle: 'long',
             })}
           </p>
         )}
-        {event.location && <p>{event.location}</p>}
+        {event!.location && <p>{event!.location}</p>}
       </div>
 
-      {event.description && (
-        <p className="mt-4 text-gray-700 leading-relaxed">{event.description}</p>
+      {event!.description && (
+        <p className="mt-4 text-gray-700 leading-relaxed">{event!.description}</p>
       )}
 
       <div className="mt-10">

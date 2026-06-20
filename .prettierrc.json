@@ -5,7 +5,7 @@
   "printWidth": 100,
   "overrides": [
     {
-      "files": "client/**/*.{js,jsx}",
+      "files": "client/**/*.{js,jsx,ts,tsx}",
       "options": { "singleQuote": true }
     }
   ]

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import ErrorBoundary from './ErrorBoundary.jsx';
+import ErrorBoundary from './ErrorBoundary';
 
-function Boom() {
+function Boom(): never {
   throw new Error('boom');
 }
 

@@ -4,14 +4,14 @@ Full-stack event reservation and multi-tier ticketing platform.
 
 ## Stack
 
-| Layer    | Technology                                                                           |
-| -------- | ------------------------------------------------------------------------------------ |
-| API      | Node.js + Express (REST, repository pattern; migrating to TypeScript, run via `tsx`) |
-| Frontend | React + Tailwind (Vite)                                                              |
-| Database | PostgreSQL — raw `pg` queries, no ORM                                                |
-| Storage  | AWS S3 (event images)                                                                |
-| Auth     | JWT + bcrypt                                                                         |
-| WP       | PHP shortcode plugin proxying to the Node API                                        |
+| Layer    | Technology                                                               |
+| -------- | ------------------------------------------------------------------------ |
+| API      | Node.js + Express + TypeScript (REST, repository pattern; run via `tsx`) |
+| Frontend | React + TypeScript + Tailwind (Vite)                                     |
+| Database | PostgreSQL — raw `pg` queries, no ORM                                    |
+| Storage  | AWS S3 (event images)                                                    |
+| Auth     | JWT + bcrypt                                                             |
+| WP       | PHP shortcode plugin proxying to the Node API                            |
 
 ## Quick Start
 
@@ -186,10 +186,9 @@ Hardening is rolling out in phases (each lands on its own branch):
   logging, foreign-key indexes.
 - ✅ **Phase 3 — Client**: Vitest + React Testing Library, error boundary,
   `jwt-decode` with expiry, auth-storage hardening (see ADR 0003).
-- 🚧 **Phase 4 — TypeScript**: foundation in place (tsconfig, `tsx` runtime,
-  `tsc` typecheck in CI + pre-commit, ts-jest). **The entire `api/` is now
-  TypeScript** (config → repositories → services → middleware → routes →
-  app/server, plus shared domain types). The client (`.jsx`→`.tsx`) migrates
-  next; `allowJs` keeps any remaining JS working.
+- ✅ **Phase 4 — TypeScript**: the **API** (`tsx` runtime, ts-jest) and the
+  **client** (Vite + `tsc --noEmit`, strict) are both TypeScript, end to end.
+  `tsc` typechecks run in CI and pre-commit. (The `db/` scripts and the Jest
+  test files remain JS via `allowJs`.)
 - ⬜ **Phase 5 — Dependencies & polish**: dependency updates, presigned S3 URLs,
   password strength, API error-code docs.

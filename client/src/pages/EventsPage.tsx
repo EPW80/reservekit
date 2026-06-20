@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../api/client.js';
+import api from '../api/client';
+import type { EventSummary } from '../types';
 
-function EventCard({ event }) {
+function EventCard({ event }: { event: EventSummary }) {
   const soldOut = event.sold_out;
   return (
     <Link
@@ -42,9 +43,9 @@ function EventCard({ event }) {
 }
 
 export default function EventsPage() {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<EventSummary[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     api
