@@ -186,10 +186,10 @@ Hardening is rolling out in phases (each lands on its own branch):
   logging, foreign-key indexes.
 - ✅ **Phase 3 — Client**: Vitest + React Testing Library, error boundary,
   `jwt-decode` with expiry, auth-storage hardening (see ADR 0003).
-- ✅ **Phase 4 — TypeScript**: the **API** (`tsx` runtime, ts-jest) and the
-  **client** (Vite + `tsc --noEmit`, strict) are both TypeScript, end to end.
-  `tsc` typechecks run in CI and pre-commit. (The `db/` scripts and the Jest
-  test files remain JS via `allowJs`.)
+- ✅ **Phase 4 — TypeScript**: the **API** (`tsx` runtime, ts-jest), the
+  **client** (Vite + `tsc --noEmit`, strict), the **`db/` scripts**, and the
+  **Jest test suite** are all TypeScript, end to end. `tsc` typechecks the whole
+  project (including tests) in CI and pre-commit.
 - ✅ **Phase 5 — Dependencies & polish**: security-driven dependency updates
   (**0 production vulnerabilities**), dropped `uuid` for native
   `crypto.randomUUID`, removed unused `nodemon`, and an API reference at

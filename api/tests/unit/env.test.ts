@@ -1,4 +1,4 @@
-const { validateEnv } = require("../../config/env");
+import { validateEnv } from "../../config/env";
 
 const validSecret = "x".repeat(32);
 

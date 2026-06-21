@@ -1,9 +1,9 @@
-const request = require("supertest");
-const app = require("../../app");
-const { truncateAll, db } = require("../helpers/db");
-const { createUser, createEvent, createTier, makeToken } = require("../helpers/factories");
+import request from "supertest";
+import app from "../../app";
+import { truncateAll, db } from "../helpers/db";
+import { createUser, createEvent, createTier, makeToken } from "../helpers/factories";
 
-let adminId, adminToken;
+let adminId: any, adminToken: any;
 
 beforeEach(async () => {
   await truncateAll();
@@ -362,7 +362,7 @@ describe("DELETE /api/events/:id", () => {
       .set("Authorization", `Bearer ${adminToken}`);
 
     const list = await request(app).get("/api/events");
-    expect(list.body.data.find((e) => e.id === event.id)).toBeUndefined();
+    expect(list.body.data.find((e: any) => e.id === event.id)).toBeUndefined();
   });
 
   it("returns 404 for a non-existent event", async () => {

@@ -3,11 +3,11 @@
  * Creates the schema on the test database (idempotent — safe to re-run).
  * process.env.DATABASE_URL is already pointed at the test DB by jest.config.js.
  */
-const { Pool } = require("pg");
-const fs = require("fs");
-const path = require("path");
+import { Pool } from "pg";
+import fs from "fs";
+import path from "path";
 
-module.exports = async () => {
+async function globalSetup(): Promise<void> {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
   await pool.query(`
@@ -34,4 +34,6 @@ module.exports = async () => {
   }
 
   await pool.end();
-};
+}
+
+export = globalSetup;

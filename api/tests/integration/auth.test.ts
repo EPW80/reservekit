@@ -1,7 +1,7 @@
-const request = require("supertest");
-const app = require("../../app");
-const { truncateAll } = require("../helpers/db");
-const { createUser } = require("../helpers/factories");
+import request from "supertest";
+import app from "../../app";
+import { truncateAll } from "../helpers/db";
+import { createUser } from "../helpers/factories";
 
 beforeEach(() => truncateAll());
 

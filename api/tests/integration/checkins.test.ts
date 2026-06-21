@@ -1,10 +1,10 @@
-const request = require("supertest");
-const app = require("../../app");
-const { truncateAll, db } = require("../helpers/db");
-const { createUser, createEvent, createTier, makeToken } = require("../helpers/factories");
+import request from "supertest";
+import app from "../../app";
+import { truncateAll, db } from "../helpers/db";
+import { createUser, createEvent, createTier, makeToken } from "../helpers/factories";
 
-let adminUser, staffUser, normalUser, staffToken, userToken;
-let event, tier;
+let adminUser: any, staffUser: any, normalUser: any, staffToken: any, userToken: any;
+let event: any, tier: any;
 
 beforeEach(async () => {
   await truncateAll();
@@ -33,7 +33,7 @@ beforeEach(async () => {
 // ── POST /api/checkins ────────────────────────────────────────────────────────
 
 describe("POST /api/checkins", () => {
-  let reservation;
+  let reservation: any;
 
   beforeEach(async () => {
     const { rows } = await db.query(

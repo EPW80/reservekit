@@ -1,9 +1,9 @@
-require("dotenv").config();
-const fs = require("fs");
-const path = require("path");
-const db = require("../api/config/db");
+import "dotenv/config";
+import fs from "fs";
+import path from "path";
+import db from "../api/config/db";
 
-async function migrate() {
+async function migrate(): Promise<void> {
   await db.query(`
     CREATE TABLE IF NOT EXISTS _migrations (
       id       SERIAL PRIMARY KEY,

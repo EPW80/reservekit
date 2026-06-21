@@ -1,8 +1,8 @@
-require("dotenv").config();
-const bcrypt = require("bcrypt");
-const db = require("../api/config/db");
+import "dotenv/config";
+import bcrypt from "bcrypt";
+import db from "../api/config/db";
 
-async function seed() {
+async function seed(): Promise<void> {
   // ── Users ──────────────────────────────────────────────────────────────────
   const [adminHash, staffHash, userHash] = await Promise.all([
     bcrypt.hash("admin123", 10),

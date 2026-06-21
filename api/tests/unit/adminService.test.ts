@@ -1,4 +1,4 @@
-const { sanitizeCsvField } = require("../../services/adminService");
+import { sanitizeCsvField } from "../../services/adminService";
 
 describe("sanitizeCsvField", () => {
   test("wraps plain values in quotes", () => {

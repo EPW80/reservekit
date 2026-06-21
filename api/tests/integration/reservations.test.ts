@@ -1,9 +1,9 @@
-const request = require("supertest");
-const app = require("../../app");
-const { truncateAll, db } = require("../helpers/db");
-const { createUser, createEvent, createTier, makeToken } = require("../helpers/factories");
+import request from "supertest";
+import app from "../../app";
+import { truncateAll, db } from "../helpers/db";
+import { createUser, createEvent, createTier, makeToken } from "../helpers/factories";
 
-let user, adminUser, event, tier, userToken;
+let user: any, adminUser: any, event: any, tier: any, userToken: any;
 
 beforeEach(async () => {
   await truncateAll();
@@ -118,7 +118,7 @@ describe("POST /api/reservations", () => {
 // ── GET /api/reservations/:id ─────────────────────────────────────────────────
 
 describe("GET /api/reservations/:id", () => {
-  let reservation;
+  let reservation: any;
 
   beforeEach(async () => {
     const { rows } = await db.query(
@@ -188,7 +188,7 @@ describe("GET /api/reservations/:id", () => {
 // ── GET /api/reservations/:id/qr ─────────────────────────────────────────────
 
 describe("GET /api/reservations/:id/qr", () => {
-  let reservation;
+  let reservation: any;
 
   beforeEach(async () => {
     const { rows } = await db.query(

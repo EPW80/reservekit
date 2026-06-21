@@ -3,4 +3,6 @@
  * Worker pg pools close when worker processes exit.
  * jest.config.js sets forceExit: true to handle any remaining open handles.
  */
-module.exports = async () => {};
+async function globalTeardown(): Promise<void> {}
+
+export = globalTeardown;
