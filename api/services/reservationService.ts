@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "node:crypto";
 import * as reservationRepository from "../repositories/reservationRepository";
 import * as tierRepository from "../repositories/tierRepository";
 import type { JwtUser } from "../types";
@@ -14,7 +14,7 @@ export async function create(user: JwtUser, body: { event_id: number; tier_id: n
   // Atomic: increments sold_count only if sold_count < capacity; throws CONFLICT if sold out
   await tierRepository.decrementCapacity(tier_id);
 
-  const qr_code = uuidv4();
+  const qr_code = randomUUID();
   return reservationRepository.create({ user_id: user.sub, event_id, tier_id, qr_code });
 }
 

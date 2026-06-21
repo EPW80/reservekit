@@ -88,7 +88,7 @@ rate-limited; intended for load-balancer / orchestrator probes.
 
 **Response envelope:** `{ "data": ..., "error": null }` or `{ "data": null, "error": { "code", "message" } }`
 
-**Error codes:** `VALIDATION_ERROR` (400) · `UNAUTHORIZED` (401) · `FORBIDDEN` (403) · `NOT_FOUND` (404) · `CONFLICT` (409) · `INTERNAL` (500)
+**Error codes:** `VALIDATION_ERROR` (400) · `UNAUTHORIZED` (401) · `FORBIDDEN` (403) · `NOT_FOUND` (404) · `CONFLICT` (409) · `RATE_LIMITED` (429) · `INTERNAL` (500). Full reference: [`docs/API.md`](docs/API.md).
 
 ## Architecture
 
@@ -190,5 +190,7 @@ Hardening is rolling out in phases (each lands on its own branch):
   **client** (Vite + `tsc --noEmit`, strict) are both TypeScript, end to end.
   `tsc` typechecks run in CI and pre-commit. (The `db/` scripts and the Jest
   test files remain JS via `allowJs`.)
-- ⬜ **Phase 5 — Dependencies & polish**: dependency updates, presigned S3 URLs,
-  password strength, API error-code docs.
+- ✅ **Phase 5 — Dependencies & polish**: security-driven dependency updates
+  (**0 production vulnerabilities**), dropped `uuid` for native
+  `crypto.randomUUID`, removed unused `nodemon`, and an API reference at
+  [`docs/API.md`](docs/API.md).
