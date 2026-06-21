@@ -15,6 +15,12 @@ Full-stack event reservation and multi-tier ticketing platform.
 
 ## Quick Start
 
+**Fastest:** `./start.sh` — creates `.env` (with a generated JWT secret), starts a
+Postgres container, runs migrations + seed, and launches the API and client.
+(`SKIP_DOCKER=1` to use your own DB, `DB_PORT=5544` if 5432 is taken.)
+
+Manual setup:
+
 ```bash
 npm install && npm --prefix client install
 cp .env.example .env          # fill in DB, JWT, AWS creds
